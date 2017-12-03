@@ -180,16 +180,64 @@ namespace disasm
 
 		return muxtable[mux];
 	}
+	std::string hex(uint64_t val)
+	{
+		std::stringstream ss;
+		ss << std::hex << val << 'h';
+		return ss.str();
+	}
+	const char* cond(uint64_t cond)
+	{
+		static const char* cond_codes[] = {
+			"never",
+			"always",
+			"ZS",
+			"ZC",
+			"NS",
+			"NC",
+			"CS",
+			"CC"
+		};
+
+		assert(cond < std::size(cond_codes));
+
+		return cond_codes[cond];
+	}
+	const char* signal(uint64_t signal)
+	{
+		const char* signal_meanings[] = {
+			"[0] Software Breakpoint",
+			"[1] No Signal",
+			"[2] Thread Switch (not last)",
+			"[3] Program End",
+			"[4] Wait for Scoreboard",
+			"[5] Scoreboard Unlock",
+			"[6] Last Thread Switch",
+			"[7] Coverage load from Tile Buffer to r4",
+			"[8] Color Load from Tile Buffer to r4",
+			"[9] Color Load and Program End",
+			"[10] Load data from TMU0 to r4",
+			"[11] Load data from TMU1 to r4",
+			"[12] Alpha-Mask Load for Tile Buffer to r4",
+			"[13] Small Immediate ALU Instruction",
+			"[14] Load Immediate Instruction",
+			"[15] Branch Instruction"
+		};
+
+		assert(signal < std::size(signal_meanings));
+
+		return signal_meanings[signal];
+	}
 
 	std::ostream& instruction::print(std::ostream& os) const
 	{
 		return os
-			<< "\tsig: " << sig << '\n'
+			<< "\tsig: " << signal(sig) << '\n'
 			<< "\tunpack: " << unpack << '\n'
 			<< "\tpm: " << pm << '\n'
 			<< "\tpack: " << pack << '\n'
-			<< "\tcond_add: " << cond_add << '\n'
-			<< "\tcond_mul: " << cond_mul << '\n'
+			<< "\tcond_add: " << cond(cond_add) << '\n'
+			<< "\tcond_mul: " << cond(cond_mul) << '\n'
 			<< "\tsf: " << sf << '\n'
 			<< "\tws: " << ws << '\n'
 			<< "\twaddr_add: " << reg(waddr_add, !ws, 1) << '\n'
@@ -227,7 +275,7 @@ namespace disasm
 	std::ostream& load_imm32::print(std::ostream& os) const
 	{
 		return instruction::print(os << "Load Immediate Instruction:\n")
-			<< "\timmediate: " << immediate << '\n';
+			<< "\timmediate: " << hex(immediate) << '\n';
 	}
 	std::ostream& load_imm_per_elmt_unsigned::print(std::ostream& os) const
 	{
