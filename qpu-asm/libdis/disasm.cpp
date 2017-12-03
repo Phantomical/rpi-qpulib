@@ -113,13 +113,13 @@ namespace disasm
 	}
 
 	void disasm(
-		const uint64_t* input, size_t n_input,
+		const std::vector<uint64_t>& input_vec,
 		std::vector<inst_ptr>& output)
 	{
-		for (size_t i = 0; i < n_input; ++i)
+		for (auto input : input_vec)
 		{
-			uint64_t sig    = BITS_AT(input[i], 60, 4);
-			uint64_t unpack = BITS_AT(input[i], 57, 3);
+			uint64_t sig    = BITS_AT(input, 60, 4);
+			uint64_t unpack = BITS_AT(input, 57, 3);
 			
 			switch (sig)
 			{
@@ -127,29 +127,29 @@ namespace disasm
 				switch (unpack)
 				{
 				case 0b000:
-					output.emplace_back(decode_load_imm32(input[i]));
+					output.emplace_back(decode_load_imm32(input));
 					break;
 				case 0b001:
-					output.emplace_back(decode_load_imm_per_elmt_signed(input[i]));
+					output.emplace_back(decode_load_imm_per_elmt_signed(input));
 					break;
 				case 0b011:
-					output.emplace_back(decode_load_imm_per_elmt_unsigned(input[i]));
+					output.emplace_back(decode_load_imm_per_elmt_unsigned(input));
 					break;
 				case 0b100:
-					output.emplace_back(decode_semaphore(input[i]));
+					output.emplace_back(decode_semaphore(input));
 					break;
 				default:
 					throw std::logic_error("Invalid Opcode Found");
 				}
 				break;
 			case 0b1101:
-				output.emplace_back(decode_alu_small_imm_op(input[i]));
+				output.emplace_back(decode_alu_small_imm_op(input));
 				break;
 			case 0b1111:
-				output.emplace_back(decode_branch_op(input[i]));
+				output.emplace_back(decode_branch_op(input));
 				break;
 			default:
-				output.emplace_back(decode_alu_op(input[i]));
+				output.emplace_back(decode_alu_op(input));
 				break;
 			}
 		}

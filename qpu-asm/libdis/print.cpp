@@ -111,12 +111,12 @@ namespace disasm
 		{
 			switch (regid)
 			{
-			case 32: return "ACC0";
-			case 33: return "ACC1";
-			case 34: return "ACC2";
-			case 35: return "ACC3";
+			case 32: return "r0";
+			case 33: return "r1";
+			case 34: return "r2";
+			case 35: return "r3";
 			case 36: return "TMU_NOSWAP";
-			case 37: return "ACC5";
+			case 37: return "r5";
 			case 38: return "HOST_INT";
 			case 39: return "NOP";
 			case 40: return "UNIFORMS_ADDRESS";

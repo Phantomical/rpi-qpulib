@@ -39,7 +39,7 @@ int main(int argc, char** argv)
 		std::vector<uint64_t> binary = readfile(argv[1]);
 		
 		std::vector<std::unique_ptr<disasm::instruction>> instructions;
-		disasm::disasm(binary.data(), binary.size(), instructions);
+		disasm::disasm(binary, instructions);
 
 		//std::cout << std::hex;
 
