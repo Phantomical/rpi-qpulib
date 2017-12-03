@@ -8,7 +8,9 @@ namespace disasm
 #define MASK(bits) (((uint64_t)1 << bits) - 1)
 #define BITS_AT(value, position, nbits) ((value >> position) & MASK(nbits))
 
-	void decode_header(instruction* inst, std::uint64_t opcode)
+	typedef std::unique_ptr<instruction> inst_ptr;
+
+	void decode_header(instruction* inst, uint64_t opcode)
 	{
 		inst->sig       = BITS_AT(opcode, 60, 4);
 		inst->unpack    = BITS_AT(opcode, 57, 3);
@@ -22,7 +24,7 @@ namespace disasm
 		inst->waddr_mul = BITS_AT(opcode, 32, 6);
 	}
 
-	std::unique_ptr<instruction> decode_alu_op(std::uint64_t opcode)
+	inst_ptr decode_alu_op(uint64_t opcode)
 	{
 		alu* op = new alu;
 
@@ -37,10 +39,9 @@ namespace disasm
 		op->mul_a   = BITS_AT(opcode, 3, 3);
 		op->mul_b   = BITS_AT(opcode, 0, 3);
 
-		return std::unique_ptr<instruction>(op);
+		return inst_ptr(op);
 	}
-
-	std::unique_ptr<instruction> decode_alu_small_imm_op(std::uint64_t opcode)
+	inst_ptr decode_alu_small_imm_op(uint64_t opcode)
 	{
 		alu_small_imm* op = new alu_small_imm;
 
@@ -55,10 +56,9 @@ namespace disasm
 		op->mul_a       = BITS_AT(opcode, 3, 3);
 		op->mul_b       = BITS_AT(opcode, 0, 3);
 
-		return std::unique_ptr<instruction>(op);
+		return inst_ptr(op);
 	}
-
-	std::unique_ptr<instruction> decode_branch_op(std::uint64_t opcode)
+	inst_ptr decode_branch_op(uint64_t opcode)
 	{
 		branch* op = new branch;
 
@@ -66,19 +66,82 @@ namespace disasm
 
 		op->immediate = BITS_AT(opcode, 0, 32);
 
-		return std::unique_ptr<instruction>(op);
+		return inst_ptr(op);
+	}
+	inst_ptr decode_load_imm32(uint64_t opcode)
+	{
+		load_imm32* op = new load_imm32;
+
+		decode_header(op, opcode);
+
+		op->immediate = BITS_AT(opcode, 0, 32);
+
+		return inst_ptr(op);
+	}
+	inst_ptr decode_load_imm_per_elmt_signed(uint64_t opcode)
+	{
+		load_imm_per_elmt_signed* op = new load_imm_per_elmt_signed;
+
+		decode_header(op, opcode);
+
+		op->per_elmt_ms_bit = BITS_AT(opcode, 16, 16);
+		op->per_elmt_ls_bit = BITS_AT(opcode, 00, 16);
+
+		return inst_ptr(op);
+	}
+	inst_ptr decode_load_imm_per_elmt_unsigned(uint64_t opcode)
+	{
+		load_imm_per_elmt_unsigned* op = new load_imm_per_elmt_unsigned;
+
+		decode_header(op, opcode);
+
+		op->per_elmt_ms_bit = BITS_AT(opcode, 16, 16);
+		op->per_elmt_ls_bit = BITS_AT(opcode, 00, 16);
+
+		return inst_ptr(op);
+	}
+	inst_ptr decode_semaphore(uint64_t opcode)
+	{
+		semaphore_inst* op = new semaphore_inst;
+
+		decode_header(op, opcode);
+
+		op->sa        = BITS_AT(opcode, 4, 1);
+		op->semaphore = BITS_AT(opcode, 0, 4);
+
+		return inst_ptr(op);
 	}
 
 	void disasm(
-		const std::uint64_t* input, size_t n_input,
-		std::vector<std::unique_ptr<instruction>>& output)
+		const uint64_t* input, size_t n_input,
+		std::vector<inst_ptr>& output)
 	{
 		for (size_t i = 0; i < n_input; ++i)
 		{
-			uint64_t sig = BITS_AT(input[i], 60, 4);
+			uint64_t sig    = BITS_AT(input[i], 60, 4);
+			uint64_t unpack = BITS_AT(input[i], 57, 3);
 			
 			switch (sig)
 			{
+			case 0b1110:
+				switch (unpack)
+				{
+				case 0b000:
+					output.emplace_back(decode_load_imm32(input[i]));
+					break;
+				case 0b001:
+					output.emplace_back(decode_load_imm_per_elmt_signed(input[i]));
+					break;
+				case 0b011:
+					output.emplace_back(decode_load_imm_per_elmt_unsigned(input[i]));
+					break;
+				case 0b100:
+					output.emplace_back(decode_semaphore(input[i]));
+					break;
+				default:
+					throw std::logic_error("Invalid Opcode Found");
+				}
+				break;
 			case 0b1101:
 				output.emplace_back(decode_alu_small_imm_op(input[i]));
 				break;

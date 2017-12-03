@@ -5,10 +5,10 @@ namespace qpuasm
 {
 	void print_binary(
 		const std::vector<std::unique_ptr<instruction>>& instructions,
-		std::vector<std::uint64_t>& output);
+		std::vector<uint64_t>& output);
 
 	void read_binary(
-		const std::vector<std::uint64_t>& binary,
+		const std::vector<uint64_t>& binary,
 		std::vector<std::unique_ptr<instruction>>& output)
 	{
 

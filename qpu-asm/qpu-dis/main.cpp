@@ -7,7 +7,7 @@
 #include <fstream>
 #include <intrin.h>
 
-std::vector<std::uint64_t> readfile(const char* filename)
+std::vector<uint64_t> readfile(const char* filename)
 {
 	std::ifstream ifs(filename, std::ios::in | std::ios::binary | std::ios::ate);
 
@@ -55,6 +55,14 @@ int main(int argc, char** argv)
 			<< "'."
 			<< std::endl;
 		return 1;
+	}
+	catch (const std::logic_error& e)
+	{
+		std::cerr << "Error while decoding: '"
+			<< e.what()
+			<< "'"
+			<< std::endl;
+		return 2;
 	}
 
 	return 0;

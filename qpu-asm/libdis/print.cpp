@@ -3,6 +3,7 @@
 #include <iostream>
 #include <sstream>
 #include <cassert>
+#include <bitset>
 
 namespace disasm
 {
@@ -221,6 +222,29 @@ namespace disasm
 	std::ostream& branch::print(std::ostream& os) const
 	{
 		return instruction::print(os << "Branch Instruction:\n")
+			<< "\toffset: " << (int32_t)immediate << '\n';
+	}
+	std::ostream& load_imm32::print(std::ostream& os) const
+	{
+		return instruction::print(os << "Load Immediate Instruction:\n")
 			<< "\timmediate: " << immediate << '\n';
+	}
+	std::ostream& load_imm_per_elmt_unsigned::print(std::ostream& os) const
+	{
+		return instruction::print(os << "Load Unsigned Per-Element Immediate:\n")
+			<< "\tper-element MS bit: " << std::bitset<16>(per_elmt_ms_bit) << '\n'
+			<< "\tper-element LS bit: " << std::bitset<16>(per_elmt_ls_bit) << '\n';
+	}
+	std::ostream& load_imm_per_elmt_signed::print(std::ostream& os) const
+	{
+		return instruction::print(os << "Load Signed Per-Element Immediate:\n")
+			<< "\tper-element MS bit: " << std::bitset<16>(per_elmt_ms_bit) << '\n'
+			<< "\tper-element LS bit: " << std::bitset<16>(per_elmt_ls_bit) << '\n';
+	}
+	std::ostream& semaphore_inst::print(std::ostream& os) const
+	{
+		return instruction::print(os << "Semaphore Instruction:\n")
+			<< "\tsa: " << sa << '\n'
+			<< "\tsemaphore: " << semaphore << '\n';
 	}
 }

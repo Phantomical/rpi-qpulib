@@ -56,9 +56,36 @@ namespace disasm
 
 		virtual std::ostream& print(std::ostream& o) const override;
 	};
+	struct load_imm32 : instruction
+	{
+		uint32_t immediate;
+
+		virtual std::ostream& print(std::ostream& o) const override;
+	};
+	struct load_imm_per_elmt_unsigned : instruction
+	{
+		uint16_t per_elmt_ms_bit;
+		uint16_t per_elmt_ls_bit;
+
+		virtual std::ostream& print(std::ostream& o) const override;
+	};
+	struct load_imm_per_elmt_signed : instruction
+	{
+		uint16_t per_elmt_ms_bit;
+		uint16_t per_elmt_ls_bit;
+
+		virtual std::ostream& print(std::ostream& o) const override;
+	};
+	struct semaphore_inst : instruction
+	{
+		uint8_t sa : 1;
+		uint8_t semaphore : 4;
+
+		virtual std::ostream& print(std::ostream& o) const override;
+	};
 
 	void disasm(
-		const std::uint64_t* input, size_t n_input,
+		const uint64_t* input, size_t n_input,
 		std::vector<std::unique_ptr<instruction>>& output);
 
 }
