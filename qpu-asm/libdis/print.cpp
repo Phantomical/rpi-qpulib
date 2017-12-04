@@ -120,12 +120,12 @@ namespace disasm
 			case 38: return "HOST_INT";
 			case 39: return "NOP";
 			case 40: return "UNIFORMS_ADDRESS";
-			case 41: 
+			case 41:
 				if (regfile_a)
 					return "QUAD_X";
 				else
 					return "QUAD_Y";
-			case 42: 
+			case 42:
 				if (regfile_a)
 					return "MS_FLAGS";
 				else
@@ -136,7 +136,7 @@ namespace disasm
 			case 46: return "TLB_COLOUR_ALL";
 			case 47: return "TLB_ALPHA_MASK";
 			case 48: return "VPM_WRITE";
-			case 49: 
+			case 49:
 				if (regfile_a)
 					return "VPMVCD_RD_SETUP";
 				else
@@ -229,13 +229,99 @@ namespace disasm
 		return signal_meanings[signal];
 	}
 
+	const char* ra_unpack(uint64_t unpack)
+	{
+		static const char* unpack_vals[] = {
+			"nop",
+			"16a -> 32",
+			"16b -> 32",
+			"8d rep -> 32",
+			"8a -> 32",
+			"8b -> 32",
+			"8c -> 32",
+			"8d -> 32"
+		};
+
+		assert(unpack < std::size(unpack_vals));
+
+		return unpack_vals[unpack];
+	}
+	const char* ra_pack(uint64_t pack)
+	{
+		static const char* pack_vals[] = {
+			"nop",
+			"32 -> 16a",
+			"32 -> 16b",
+			"32 -> 8888",
+			"32 -> 8a",
+			"32 -> 8b",
+			"32 -> 8c",
+			"32 -> 8d",
+			"32 -> 32 sat",
+			"32 -> 16a sat",
+			"32 -> 16b sat",
+			"32 -> 8888 sat",
+			"32 -> 8a sat",
+			"32 -> 8b sat",
+			"32 -> 8c sat",
+			"32 -> 8d sat"
+		};
+
+		assert(pack < std::size(pack_vals));
+
+		return pack_vals[pack];
+	}
+	const char* r4_unpack(uint64_t pack)
+	{
+		static const char* pack_vals[] = {
+			"nop",
+			"16a -> 32",
+			"16b -> 32",
+			"8d rep -> 32",
+			"8a -> 32",
+			"8b -> 32",
+			"8c -> 32",
+			"8d -> 32"
+		};
+
+		assert(pack < std::size(pack_vals));
+
+		return pack_vals[pack];
+	}
+	const char* mul_pack(uint64_t pack)
+	{
+		switch (pack)
+		{
+		case 0: return "nop";
+		case 3: return "32 -> 8888";
+		case 4: return "32 -> 8a";
+		case 5: return "32 -> 8b";
+		case 6: return "32 -> 8c";
+		case 7: return "32 -> 8d";
+		default:return "#UNKNOWN#";
+		}
+	}
+
+	const char* unpack_m(uint64_t pm, uint64_t unpack)
+	{
+		if (!pm)
+			return ra_unpack(unpack);
+		return r4_unpack(unpack);
+	}
+	const char* pack_m(uint64_t pm, uint64_t pack)
+	{
+		if (!pm)
+			return ra_pack(pack);
+		return mul_pack(pack);
+	}
+
 	std::ostream& instruction::print(std::ostream& os) const
 	{
 		return os
 			<< "\tsig: " << signal(sig) << '\n'
-			<< "\tunpack: " << unpack << '\n'
+			<< "\tunpack: " << unpack_m(pm, unpack) << '\n'
 			<< "\tpm: " << pm << '\n'
-			<< "\tpack: " << pack << '\n'
+			<< "\tpack: " << pack_m(pm, pack) << '\n'
 			<< "\tcond_add: " << cond(cond_add) << '\n'
 			<< "\tcond_mul: " << cond(cond_mul) << '\n'
 			<< "\tsf: " << sf << '\n'

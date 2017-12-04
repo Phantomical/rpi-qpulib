@@ -84,24 +84,6 @@ namespace disasm
 		virtual std::ostream& print(std::ostream& o) const override;
 	};
 
-	struct reg
-	{
-		enum
-		{
-			accumulator,
-			regfile_a,
-			regfile_b,
-			small_immed
-		};
-
-		uint8_t id : 6;
-	};
-
-	struct add_op
-	{
-		
-	};
-
 	void disasm(
 		const std::vector<uint64_t>& input,
 		std::vector<std::unique_ptr<instruction>>& output);
