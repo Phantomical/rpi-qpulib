@@ -7,7 +7,7 @@ namespace qpu
 	{
 		void initialize(volatile void* V3D_BASE)
 		{
-#define V3D_OFFSET(x) (volatile void*)((volatile char*)V3D_BASE + x)
+#define V3D_OFFSET(x) (volatile uint32_t*)((volatile char*)V3D_BASE + x)
 
 			V3D_IDENT0  = V3D_OFFSET(0x00000);
 			V3D_IDENT1  = V3D_OFFSET(0x00004);
