@@ -1,10 +1,13 @@
 
 #include "device.h"
+#include "registers.h"
 
 #include <cstdint>
 #include <cstring>
 #include <cassert>
 #include <new>
+#include <unordered_map>
+#include <vector>
 
 namespace qpu
 {
