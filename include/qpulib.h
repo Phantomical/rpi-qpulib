@@ -1,7 +1,8 @@
 #pragma once
 #pragma warning (disable : 4514)
 
-#include <memory>
+#include <cstdlib>
+#include <cstdint>
 
 namespace qpu
 {

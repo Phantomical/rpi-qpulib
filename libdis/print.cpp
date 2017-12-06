@@ -1,12 +1,19 @@
 #include "disasm.h"
 
-#include <iostream>
+#include <bitset>
 #include <sstream>
 #include <cassert>
-#include <bitset>
+#include <iostream>
+#include <iterator>
 
 namespace disasm
 {
+	template<typename T, size_t N>
+	constexpr size_t size(const T(&array)[N])
+	{
+		return N;
+	}
+
 	/* Print Implementations */
 	const char* mul_op(uint64_t op)
 	{
@@ -176,7 +183,7 @@ namespace disasm
 			"Regfile B"
 		};
 
-		assert(mux < std::size(muxtable));
+		assert(mux < size(muxtable));
 
 		return muxtable[mux];
 	}
@@ -199,7 +206,7 @@ namespace disasm
 			"CC"
 		};
 
-		assert(cond < std::size(cond_codes));
+		assert(cond < size(cond_codes));
 
 		return cond_codes[cond];
 	}
@@ -224,7 +231,7 @@ namespace disasm
 			"[15] Branch Instruction"
 		};
 
-		assert(signal < std::size(signal_meanings));
+		assert(signal < size(signal_meanings));
 
 		return signal_meanings[signal];
 	}
@@ -242,7 +249,7 @@ namespace disasm
 			"8d -> 32"
 		};
 
-		assert(unpack < std::size(unpack_vals));
+		assert(unpack < size(unpack_vals));
 
 		return unpack_vals[unpack];
 	}
@@ -267,7 +274,7 @@ namespace disasm
 			"32 -> 8d sat"
 		};
 
-		assert(pack < std::size(pack_vals));
+		assert(pack < size(pack_vals));
 
 		return pack_vals[pack];
 	}
@@ -284,7 +291,7 @@ namespace disasm
 			"8d -> 32"
 		};
 
-		assert(pack < std::size(pack_vals));
+		assert(pack < size(pack_vals));
 
 		return pack_vals[pack];
 	}

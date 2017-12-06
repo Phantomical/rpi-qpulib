@@ -2,10 +2,10 @@
 #include "disasm.h"
 
 #include <iostream>
-#include <vector>
 #include <iterator>
+#include <vector>
 #include <fstream>
-#include <intrin.h>
+#include <cstring>
 
 std::vector<uint64_t> readfile(const char* filename)
 {

@@ -25,17 +25,24 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <assert.h>
-#include <stdint.h>
-#include <sys/mman.h>
-#include <sys/ioctl.h>
+#include <cstdio>
+#include <cstring>
+#include <cstdlib>
+#include <cassert>
+#include <cstdint>
 
 #include "mailbox.h"
+
+#ifdef HAVE_MAILBOX_HEADERS
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/mman.h>
+#include <sys/ioctl.h>
+#include <linux/ioctl.h>
+
+#define MAJOR_NUM 100
+#define IOCTL_MBOX_PROPERTY _IOWR(MAJOR_NUM, 0, char *)
+#define DEVICE_FILE_NAME "/dev/vcio"
 
 #define PAGE_SIZE (4*1024)
 
@@ -60,7 +67,8 @@ void *mapmem(unsigned base, unsigned size)
    printf("base=0x%x, mem=%p\n", base, mem);
 #endif
    if (mem == MAP_FAILED) {
-      printf("mmap error %d\n", (int)mem);
+      printf("mmap error %d\n", static_cast<int>(
+		  reinterpret_cast<std::intptr_t>(mem)));
       exit (-1);
    }
    close(mem_fd);
@@ -256,3 +264,5 @@ int mbox_open() {
 void mbox_close(int file_desc) {
   close(file_desc);
 }
+
+#endif

@@ -25,16 +25,9 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <linux/ioctl.h>
-
-#define MAJOR_NUM 100
-#define IOCTL_MBOX_PROPERTY _IOWR(MAJOR_NUM, 0, char *)
-#define DEVICE_FILE_NAME "/dev/vcio"
-
 int mbox_open();
 void mbox_close(int file_desc);
 
-unsigned get_version(int file_desc);
 unsigned mem_alloc(int file_desc, unsigned size, unsigned align, unsigned flags);
 unsigned mem_free(int file_desc, unsigned handle);
 unsigned mem_lock(int file_desc, unsigned handle);
