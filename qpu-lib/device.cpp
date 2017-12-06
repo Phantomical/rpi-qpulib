@@ -1,6 +1,6 @@
 
 #include "qpulib.h"
-//#include "registers.h"
+#include "registers.h"
 //#include "driver.h"
 
 #include <cstdint>
