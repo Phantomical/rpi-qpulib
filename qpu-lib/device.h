@@ -14,11 +14,13 @@ namespace qpu
 		uint32_t code_size);
 	void program_delete(program* prg);
 
-	void program_set_uniforms(
+	semaphore* program_run(
 		program* prg,
+		buffer* uniform_buffer);
+
+	buffer* make_uniform_buffer(
 		const void* uniforms,
-		uint32_t uniform_buffer_size);
-	semaphore* program_run(program* prg);
+		size_t uniforms_size);
 	
 	semaphore* semaphore_create();
 	void semaphore_delete(semaphore* sema);
@@ -79,6 +81,43 @@ namespace qpuxx
 			return sema.get();
 		}
 	};
+	class buffer
+	{
+	private:
+		std::unique_ptr<qpu::buffer, void(*)(qpu::buffer*)> buf;
+
+	public:
+		buffer(uint32_t size) :
+			buf(qpu::buffer_alloc(size), &qpu::buffer_free)
+		{
+
+		}
+		buffer(qpu::buffer* bufptr) :
+			buf(bufptr, &qpu::buffer_free)
+		{
+
+		}
+		buffer(buffer&& o) :
+			buf(std::move(o.buf))
+		{
+
+		}
+
+		buffer& operator=(buffer&& o)
+		{
+			buf = std::move(o.buf);
+			return *this;
+		}
+
+		void* map()
+		{
+			return qpu::mapmem(buf.get());
+		}
+		void unmap()
+		{
+			return qpu::unmapmem(buf.get());
+		}
+	};
 	class program
 	{
 	private:
@@ -120,43 +159,6 @@ namespace qpuxx
 		semaphore run() const
 		{
 			return semaphore(qpu::program_run(prg.get()));
-		}
-	};
-	class buffer
-	{
-	private:
-		std::unique_ptr<qpu::buffer, void(*)(qpu::buffer*)> buf;
-
-	public:
-		buffer(uint32_t size) :
-			buf(qpu::buffer_alloc(size), &qpu::buffer_free)
-		{
-
-		}
-		buffer(qpu::buffer* bufptr) :
-			buf(bufptr, &qpu::buffer_free)
-		{
-
-		}
-		buffer(buffer&& o) :
-			buf(std::move(o.buf))
-		{
-
-		}
-
-		buffer& operator=(buffer&& o)
-		{
-			buf = std::move(o.buf);
-			return *this;
-		}
-
-		void* map()
-		{
-			return qpu::mapmem(buf.get());
-		}
-		void unmap()
-		{
-			return qpu::unmapmem(buf.get());
 		}
 	};
 }
