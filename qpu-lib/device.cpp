@@ -1,7 +1,7 @@
 
 #include "qpulib.h"
-#include "registers.h"
 #include "device.h"
+#include "mailbox.h"
 
 #include <new>
 #include <cassert>
@@ -30,7 +30,7 @@ namespace qpu
 
 	static device* qpu_device = nullptr;
 
-	init_err_code init_qpu()
+	init_err_code init_qpu(unsigned num_qpus)
 	{
 		int mailbox = mbox_open();
 

@@ -1,11 +1,11 @@
 
 #include "disasm.h"
 
-#include <iostream>
-#include <iterator>
 #include <vector>
 #include <fstream>
 #include <cstring>
+#include <iostream>
+#include <iterator>
 
 std::vector<uint64_t> readfile(const char* filename)
 {

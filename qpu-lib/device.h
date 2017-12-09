@@ -1,10 +1,10 @@
 
-#include "mailbox.h"
 #include "qpulib.h"
 
+#include <queue>
+#include <functional>
 #include <unordered_map>
 #include <unordered_set>
-#include <functional>
 
 namespace qpu
 {
@@ -14,8 +14,6 @@ namespace qpu
 		uint32_t bus_addr;
 		uint32_t size;
 		void* map_ptr;
-
-		~buffer();
 	};
 
 	struct program
@@ -41,8 +39,9 @@ namespace qpu
 		std::unordered_map<program*, uint32_t> program_refcounts;
 		std::unordered_map<buffer*, uint32_t> buffer_refcounts;		
 		std::unordered_set<semaphore*> inactive_semaphores;
+		std::queue<semaphore*> program_queue;
 
-		friend enum init_err_code init_qpu();
+		friend enum init_err_code init_qpu(unsigned);
 
 		device() = default;
 		device(const device&) = delete;
@@ -52,6 +51,8 @@ namespace qpu
 
 		void delete_buffer_impl(buffer* buf);
 		void delete_program_impl(program* prog);
+
+		void pump_queue();
 
 	public:
 		~device();
@@ -71,7 +72,7 @@ namespace qpu
 
 		semaphore* run_program(
 			program* prog,
-			buffer* buf);
+			buffer* uniforms);
 
 		void delete_semaphore(semaphore*);
 	};

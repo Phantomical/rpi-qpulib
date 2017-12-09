@@ -29,7 +29,7 @@ namespace qpu
 		INIT_ERR_QPU_ENABLE_FAILED,
 	};
 
-	init_err_code init_qpu();
+	init_err_code init_qpu(unsigned num_qpus);
 	void deinit_qpu();
 
 	buffer* create_buffer(size_t size, buffer_flag flag);
