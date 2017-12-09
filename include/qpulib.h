@@ -10,13 +10,35 @@ namespace qpu
 	struct program;
 	struct semaphore;
 
-	buffer* create_buffer();
+	enum buffer_flag : unsigned
+	{
+		BUF_FLAG_HINT_PERMAMAP = 1 << 0,
+		BUF_FLAG_ZERO          = 1 << 2,
+		BUF_FLAG_NO_INIT       = 1 << 3,
+		BUF_FLAG_DIRECT        = 1 << 4,
+		BUF_FLAG_COHERENT      = 1 << 5,
+
+		BUF_FLAG_ALL           = ~0u,
+	};
+
+	enum init_err_code
+	{
+		INIT_SUCCESS = 0,
+		INIT_ERR_ALREADY_INITIALIZED,
+		INIT_ERR_MAILBOX_OPEN_FAILED,
+		INIT_ERR_QPU_ENABLE_FAILED,
+	};
+
+	init_err_code init_qpu();
+	void deinit_qpu();
+
+	buffer* create_buffer(size_t size, buffer_flag flag);
 	void delete_buffer(buffer*);
 
-	void buffer_data(
-		buffer* buf, 
-		const void* data,
-		size_t size);
+	//void buffer_data(
+	//	buffer* buf, 
+	//	const void* data,
+	//	size_t size);
 
 	void* buffer_map(buffer* buf);
 	void buffer_unmap(buffer* buf);
