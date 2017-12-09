@@ -81,6 +81,9 @@ namespace qpu
 	
 	buffer* device::create_buffer(uint32_t size, buffer_flag flags)
 	{
+		if (size == 0)
+			return nullptr;
+
 		uint32_t handle = mem_alloc(
 			mailbox,
 			size,
@@ -132,11 +135,57 @@ namespace qpu
 
 		if (--it->second == 0)
 		{
-			//
+			// Delete the buffer
 			delete_buffer_impl(buf);
 
+			// Then remove it's counter entry
 			buffer_refcounts.erase(it);
 		}
 	}
+
+	void* device::buffer_map(buffer* buf)
+	{
+		// Null buffers should be dealt with
+		// before this function is called
+		assert(buf);
+
+		// The handle should be valid always
+		assert(buf->handle);
+
+		// Same with the bus address
+		assert(buf->bus_addr);
+
+		// Size needs to be greater than 0
+		assert(buf->size > 0);
+
+		if (buf->map_ptr)
+			return buf->map_ptr;
+
+		buf->map_ptr = mapmem(buf->bus_addr, buf->size);
+
+		return buf->map_ptr;
+	}
+	void device::buffer_unmap(buffer* buf)
+	{
+		// No null pointers should be 
+		// passed to this method
+		assert(buf);
+
+		// The handle should always valid
+		assert(buf->handle);
+
+		// The buffer address should always be valid
+		assert(buf->bus_addr);
+
+		// If this assert fails then the most likely
+		// cause is that the buffer has been freed
+		// twice. One reason to check for is that
+		// when a buffer that is mapped is mapped
+		// again the same mapping is returned.
+		assert(buf->map_ptr);
+
+		unmapmem(buf->map_ptr, buf->size);
+	}
+
 
 }
