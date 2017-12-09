@@ -4,6 +4,7 @@
 #include "mailbox.h"
 
 #include <new>
+#include <cstring>
 #include <cassert>
 
 namespace qpu

@@ -17,7 +17,7 @@ namespace qpu
 	static constexpr uint32_t QPURQCC_MASK  = 0xFF << 16;
 
 	static constexpr uint32_t QPURQL_RESET   = 1;
-	static constexpr uint32_t QPURQERR_RESET = QPURQERR_RESET;
+	static constexpr uint32_t QPURQERR_RESET = QPURQERR_MASK;
 	static constexpr uint32_t QPURQCM_RESET  = 1 << 8;
 	static constexpr uint32_t QPURQCC_RESET  = 1 << 16;
 
