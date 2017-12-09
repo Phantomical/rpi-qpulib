@@ -127,6 +127,8 @@ namespace qpu
 		assert(buf);
 
 		auto it = buffer_refcounts.find(buf);
+		// The buffer must exist
+		assert(it != buffer_refcounts.end());
 
 		// If this assertion fires, then most likely
 		// the same buffer has been deleted multiple
@@ -187,5 +189,61 @@ namespace qpu
 		unmapmem(buf->map_ptr, buf->size);
 	}
 
+	program* device::create_program(
+		const void* code,
+		uint32_t program_size)
+	{
+		if (!code || program_size == 0)
+			return nullptr;
 
+		buffer* code_buf = create_buffer(program_size, BUF_FLAG_NO_INIT);
+
+		if (!code_buf)
+			return nullptr;
+
+		program* prog = new (std::nothrow) program;
+
+		if (!prog)
+		{
+			delete_buffer(code_buf);
+			return nullptr;
+		}
+
+		prog->code_buf = code_buf;
+
+		void* mapptr = buffer_map(code_buf);
+		if (!mapptr) // Abort if mapping failed
+		{
+			delete_program_impl(prog);
+			return nullptr;
+		}
+
+		memcpy(mapptr, code, program_size);
+
+		buffer_unmap(code_buf);
+
+		program_refcounts.insert(std::make_pair(prog, (uint32_t)1));
+
+		return prog;
+	}
+	void device::delete_program(program* prog)
+	{
+		// Null programs should not be passed to this function
+		assert(prog);
+
+		auto it = program_refcounts.find(prog);
+
+		// The program must be in the reference counting list
+		assert(it != program_refcounts.end());
+
+		// Check for double frees
+		assert(it->second != 0);
+
+		if (--it->second == 0)
+		{
+			delete_program_impl(prog);
+
+			program_refcounts.erase(it);
+		}
+	}
 }

@@ -66,7 +66,7 @@ namespace qpu
 
 		program* create_program(
 			const void* code,
-			size_t program_size);
+			uint32_t program_size);
 		void delete_program(program* prog);
 
 		semaphore* run_program(
