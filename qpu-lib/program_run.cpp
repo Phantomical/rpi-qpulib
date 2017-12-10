@@ -97,7 +97,7 @@ namespace qpu
 			buf_uniforms, 
 			buf_uniforms_length);
 
-		program_queue.push(sema);
+		program_queue.push_back(sema);
 
 		pump_queue();
 
@@ -113,10 +113,20 @@ namespace qpu
 			assert(!program_queue.empty());
 
 			semaphore* sema = program_queue.front();
-			program_queue.pop();
+			program_queue.pop_front();
 
 			sema->is_finished = true;
 			sema->cleanup_func();
+
+			// If the semaphore has already been deleted
+			// and this is the only reference keeping it
+			// alive then delete it
+			auto it = inactive_semaphores.find(sema);
+			if (it != inactive_semaphores.end())
+			{
+				inactive_semaphores.erase(it);
+				delete sema;
+			}
 		}
 	}
 }

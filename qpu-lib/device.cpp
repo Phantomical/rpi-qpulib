@@ -4,6 +4,7 @@
 #include "mailbox.h"
 
 #include <new>
+#include <vector>
 #include <cstring>
 #include <cassert>
 
@@ -245,6 +246,33 @@ namespace qpu
 			delete_program_impl(prog);
 
 			program_refcounts.erase(it);
+		}
+	}
+
+	void device::delete_semaphore(semaphore* sema)
+	{
+		assert(sema);
+
+		if (!sema->is_finished)
+			inactive_semaphores.insert(sema);
+		else
+			delete sema;
+	}
+
+	void device::do_gc()
+	{
+		std::vector<semaphore*> to_delete;
+
+		for (auto sema : inactive_semaphores)
+		{
+			if (sema->is_finished)
+				to_delete.push_back(sema);
+		}
+
+		for (auto to_del : to_delete)
+		{
+			auto it = inactive_semaphores.find(to_del);
+			inactive_semaphores.erase(it);
 		}
 	}
 }

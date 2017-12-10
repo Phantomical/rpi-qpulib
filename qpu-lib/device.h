@@ -1,7 +1,7 @@
 
 #include "qpulib.h"
 
-#include <queue>
+#include <deque>
 #include <functional>
 #include <unordered_map>
 #include <unordered_set>
@@ -39,7 +39,7 @@ namespace qpu
 		std::unordered_map<program*, uint32_t> program_refcounts;
 		std::unordered_map<buffer*, uint32_t> buffer_refcounts;		
 		std::unordered_set<semaphore*> inactive_semaphores;
-		std::queue<semaphore*> program_queue;
+		std::deque<semaphore*> program_queue;
 
 		friend enum init_err_code init_qpu(unsigned);
 
@@ -57,7 +57,7 @@ namespace qpu
 	public:
 		~device();
 
-		void free_unreferenced();
+		void do_gc();
 
 		buffer* create_buffer(uint32_t size, buffer_flag flags);
 		void delete_buffer(buffer* buf);
