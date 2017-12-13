@@ -275,4 +275,20 @@ namespace qpu
 			inactive_semaphores.erase(it);
 		}
 	}
+
+	device::~device()
+	{
+		// Make sure all programs have finished running
+		while (!program_queue.empty()) pump_queue();
+
+		for (auto& val : program_refcounts)
+			delete_program(val.first);
+
+		for (auto& val : buffer_refcounts)
+			delete_buffer(val.first);
+
+		// Delete all semaphores that we have
+		for (auto sema : inactive_semaphores)
+			delete sema;
+	}
 }
