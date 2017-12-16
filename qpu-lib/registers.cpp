@@ -1,13 +1,73 @@
 
 #include "registers.h"
+#include "mailbox.h"
+
+#ifdef HAVE_DLSYM_H
+#include <dlfcn.h>
+#endif
 
 namespace qpu
 {
 	namespace reg
 	{
-		void initialize(volatile void* V3D_BASE)
+		void* base_addr = nullptr;
+		uint32_t peri_addr = 0;
+		uint32_t peri_size = 0;
+
+#ifdef HAVE_DLSYM_H
+		volatile void* map_base_addr()
 		{
+			if (!!base_addr)
+				return base_addr;
+
+			uint32_t(*bcm_host_get_peripheral_address)(void);
+			uint32_t(*bcm_host_get_peripheral_size)   (void);
+
+			void* handle = dlopen("libbcm_host.so", RTLD_LAZY);
+
+			if (!handle)
+				return nullptr;
+						
+			*(void **) (&bcm_host_get_peripheral_address) = dlsym(handle, "bcm_host_get_peripheral_address");
+			*(void **) (&bcm_host_get_peripheral_size)    = dlsym(handle, "bcm_host_get_peripheral_size");
+
+			if (!bcm_host_get_peripheral_address ||
+				!bcm_host_get_peripheral_size)
+			{
+				dlclose(handle);
+				return nullptr;
+			}
+
+			peri_addr = bcm_host_get_peripheral_address();
+			peri_size = bcm_host_get_peripheral_size();
+
+			dlclose(handle);
+
+			return base_addr = mapmem(peri_addr, peri_size);
+		}
+#else
+		volatile void* map_base_addr()
+		{
+			return nullptr;
+		}
+#endif
+
+		void deinitialize()
+		{
+			if (!!base_addr)
+			{
+				unmapmem(base_addr, peri_size);
+				peri_addr = 0;
+				peri_size = 0;
+			}
+		}
 #define V3D_OFFSET(x) (volatile uint32_t*)((volatile char*)V3D_BASE + x)
+		bool initialize()
+		{
+			volatile void* V3D_BASE = map_base_addr();
+
+			if (!V3D_BASE)
+				return false;
 
 			V3D_IDENT0  = V3D_OFFSET(0x00000);
 			V3D_IDENT1  = V3D_OFFSET(0x00004);
@@ -88,6 +148,7 @@ namespace qpu
 			V3D_FDBGS   = V3D_OFFSET(0x00F10);
 			V3D_ERRSTAT = V3D_OFFSET(0x00F20);
 		
+			return true;
 		}
 
 		volatile uint32_t* V3D_IDENT0  = nullptr;

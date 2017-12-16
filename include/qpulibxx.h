@@ -1,6 +1,8 @@
 
 #include "qpulib.h"
 
+#include <memory>
+
 namespace qpuxx
 {
 	class buffer

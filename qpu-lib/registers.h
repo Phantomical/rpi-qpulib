@@ -9,8 +9,9 @@ namespace qpu
 	{
 		static constexpr size_t V3D_RANGE = 0x00F20;
 
-		void initialize(volatile void* V3D_BASE);
-
+		bool initialize();
+		void deinitialiez();
+		
 		extern volatile uint32_t* V3D_IDENT0;
 		extern volatile uint32_t* V3D_IDENT1;
 		extern volatile uint32_t* V3D_IDENT2;
