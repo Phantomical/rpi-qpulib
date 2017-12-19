@@ -2,7 +2,7 @@
 #include "registers.h"
 #include "mailbox.h"
 
-#ifdef HAVE_DLSYM_H
+#ifdef HAVE_DLFCN_H
 #include <dlfcn.h>
 #endif
 

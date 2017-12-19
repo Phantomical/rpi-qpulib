@@ -11,13 +11,13 @@ file(GLOB headers
 
 include (CheckIncludeFiles)
 check_include_files("fcntl.h;unistd.h;sys/mman.h;sys/ioctl.h;linux/ioctl.h" HAVE_MAILBOX_HEADERS)
-check_include_files("dlsym.h" HAVE_DLSYM_H)
+check_include_files("dlfcn.h" HAVE_DLFCN_H)
 
 if (HAVE_MAILBOX_HEADERS)
 	add_definitions(-DHAVE_MAILBOX_HEADERS)
 endif()
-if (HAVE_DLSYM_H)
-	add_definitions(-DHAVE_DLSYM_H)
+if (HAVE_DLFCN_H)
+	add_definitions(-DHAVE_DLFCN_H)
 endif()
 
 add_library(qpu ${sources} ${headers})

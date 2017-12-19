@@ -234,6 +234,8 @@ namespace qpu
 
 	void device::do_gc()
 	{
+		pump_queue();
+
 		std::vector<semaphore*> to_delete;
 
 		for (auto sema : inactive_semaphores)

@@ -29,10 +29,12 @@ namespace qpu
 		INIT_ERR_QPU_ENABLE_FAILED,
 	};
 
+	static constexpr uint32_t NO_TIMEOUT = ~(uint32_t)0;
+
 	init_err_code init_qpu(unsigned num_qpus);
 	void deinit_qpu();
 
-	buffer* create_buffer(size_t size, buffer_flag flag);
+	buffer* create_buffer(uint32_t size, buffer_flag flag);
 	void delete_buffer(buffer*);
 
 	//void buffer_data(
@@ -47,7 +49,7 @@ namespace qpu
 
 	program* create_program(
 		const void* code,
-		size_t program_size);
+		uint32_t program_size);
 	void delete_program(
 		program* prog);
 
@@ -86,14 +88,14 @@ namespace qpu
 	   Returns: true if there are still program
 	            invocations that are queued.
 	*/
-	bool flush_queue();
+	//bool flush_queue();
 
 	/* Waits for either the semaphore to be signaled
 	   or for the timeout period to elapse.
 
 	   Parameters:
 	   sema:    The semaphore
-	   timeout: Timeout in nanoseconds, or 0xFFFFFFFF
+	   timeout: Timeout in nanoseconds, or NO_TIMEOUT
 	            to wait forever.
 	   
 	   Returns: true if the semaphore was signaled, 
